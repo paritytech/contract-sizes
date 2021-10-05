@@ -23,7 +23,7 @@ compile_solang() {
 	local outpath=target/1solang/${name}
 	local outfile=${outpath}/${name}
 	mkdir -p ${outpath}
-	solang contracts/${infile}.sol -I . --target substrate -O aggressive -o ${outpath} &> /dev/null && \
+	solang contracts/${infile}.sol -I . --target substrate -O default -o ${outpath} &> /dev/null && \
 		rm ${outfile}.contract && \
 		wasm-opt -Oz --strip-producers --zero-filled-memory -o ${outfile}_opt.wasm ${outfile}.wasm &> /dev/null && \
 		mv ${outfile}_opt.wasm ${outfile}.wasm
