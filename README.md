@@ -30,5 +30,5 @@ that won't work on solang: First, almost all contracts use EVM inline assembly w
 won't work on a compiler targeting another architecture. Second, differences in builtin types
 (address, balance) will prevent the compilation of most contracts.
 
-Therefore we need to apply substantial changes to every contract before it can beadded to the
+Therefore we need to apply substantial changes to every contract before it can bea dded to the
 corpus in order to make it compile and establish comparability.
