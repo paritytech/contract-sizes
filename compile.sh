@@ -13,7 +13,8 @@ compile_solidity() {
 		xxd -r -p ${outfile}.bin ${outfile}.raw
 		mv ${outfile}.raw ${outfile}.bin
 		cat ${outfile}.bin >> ${outpath}/../combined.bin
-		zstd ${outfile}.bin
+		zstd ${outfile}.bin &> /dev/null
+		mv ${outfile}.bin.zst ${outpath}/../result
 }
 
 compile_solang() {
@@ -27,7 +28,8 @@ compile_solang() {
 		wasm-opt -Oz --strip-producers --zero-filled-memory -o ${outfile}_opt.wasm ${outfile}.wasm &> /dev/null && \
 		mv ${outfile}_opt.wasm ${outfile}.wasm
 		cat ${outfile}.wasm >> ${outpath}/../combined.wasm
-		zstd ${outfile}.wasm
+		zstd ${outfile}.wasm &> /dev/null
+		mv ${outfile}.wasm.zst ${outpath}/../result
 }
 
 download_solc() {
@@ -44,8 +46,12 @@ download_solc() {
 compile () {
 	local contract_name=${1}
 	local solc_version=${2}
+	local ident=${contract_name##*/}
 	compile_solidity ${contract_name} $( download_solc ${solc_version} )
 	compile_solang ${contract_name}
+	local solc_size=$(wc -c <"target/solidity/result")
+	local solang_size=$(wc -c <"target/1solang/result")
+	echo "${ident} solidity: $((solc_size)) solang: $((solang_size)) wasm_overhead: $((solang_size * 100 / solc_size - 100))%"
 }
 
 rm -rf target/*
