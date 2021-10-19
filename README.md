@@ -35,8 +35,15 @@ corpus in order to make it compile and establish comparability.
 
 ## Results
 
-| Contract | EVM Size | WASM Size | Wasm Overhead |
-| -------- | -------- | --------- | ------------- |
-| ERC20PresetFixedSupply    |  2162 |  2891 | 33% |
-| UniswapV2Router02         |  5826 |  9219 | 58% |
-| **combined**              |  7849 | 11579 | 47% |
+The following results show the compressed sizes (zstd) of the evm and wasm targets together
+with their compression ratio. Wasm relative describes the relative size of the compressed
+wasm output when compared to the evm output.
+
+The concatenated row is what we get when we concatenate the uncompressed results of all
+contracts.
+
+| Contract | EVM Compressed | WASM Compressed | EVM Ratio | WASM Ratio | Wasm Relative |
+| -------- | -------------- | --------------- | --------- | ---------- | ------------- |
+| `ERC20PresetFixedSupply.sol` |  2162 |  2891 | 50% | 34% | 133% |
+| `UniswapV2Router02.sol`   |  5826 |  9219 | 30% | 28% | 158% |
+| **concatenated**          |  7849 | 11579 | 33% | 28% | 147% |

@@ -14,13 +14,14 @@ compile_solidity() {
 		mv ${outfile}.raw ${outfile}.bin
 		cat ${outfile}.bin >> ${outpath}/../combined.bin
 		zstd ${outfile}.bin &> /dev/null
-		mv ${outfile}.bin.zst ${outpath}/../result
+		mv ${outfile}.bin ${outpath}/../result
+		mv ${outfile}.bin.zst ${outpath}/../result_compressed
 }
 
 compile_solang() {
 	local infile=${1}
 	local name=${infile##*/}
-	local outpath=target/1solang/${name}
+	local outpath=target/solang/${name}
 	local outfile=${outpath}/${name}
 	mkdir -p ${outpath}
 	solang contracts/${infile}.sol -I . --target substrate --address-length 4 --value-length 4 -O default -o ${outpath} &> /dev/null && \
@@ -29,7 +30,8 @@ compile_solang() {
 		mv ${outfile}_opt.wasm ${outfile}.wasm
 		cat ${outfile}.wasm >> ${outpath}/../combined.wasm
 		zstd ${outfile}.wasm &> /dev/null
-		mv ${outfile}.wasm.zst ${outpath}/../result
+		mv ${outfile}.wasm ${outpath}/../result
+		mv ${outfile}.wasm.zst ${outpath}/../result_compressed
 }
 
 download_solc() {
@@ -49,9 +51,17 @@ compile () {
 	local ident=${contract_name##*/}
 	compile_solidity ${contract_name} $( download_solc ${solc_version} )
 	compile_solang ${contract_name}
-	local solc_size=$(wc -c <"target/solidity/result")
-	local solang_size=$(wc -c <"target/1solang/result")
-	printf "| %-25s | %5u | %5u | %2u%% |\n" ${ident} $((solc_size)) $((solang_size)) $((solang_size * 100 / solc_size - 100))
+	local evm_plain=$(wc -c <"target/solidity/result")
+	local wasm_plain=$(wc -c <"target/solang/result")
+	local evm_compressed=$(wc -c <"target/solidity/result_compressed")
+	local wasm_compressed=$(wc -c <"target/solang/result_compressed")
+	printf "| %-25s | %5u | %5u | %2u%% | %2u%% | %2u%% |\n"\
+		\`${ident}.sol\`\
+		$((evm_compressed))\
+		$((wasm_compressed))\
+		$((evm_compressed * 100 / evm_plain))\
+		$((wasm_compressed * 100 / wasm_plain))\
+		$((wasm_compressed * 100 / evm_compressed))
 }
 
 rm -rf target/*
@@ -66,20 +76,27 @@ case "$OSTYPE" in
 		;;
 esac
 
-printf "| Contract | EVM Size | WASM Size | Wasm Overhead |\n"
-printf "| -------- | -------- | --------- | ------------- |\n"
+printf "| Contract | EVM Compressed | WASM Compressed | EVM Ratio | WASM Ratio | Wasm Relative |\n"
+printf "| -------- | -------------- | --------------- | --------- | ---------- | ------------- |\n"
 
 compile "open-zeppelin/token/ERC20/presets/ERC20PresetFixedSupply" "v0.8.9+commit.e5eed63a"
 compile "UniswapV2Router02" "v0.6.6+commit.6c089d02"
 
 COMBINED_EVM=target/solidity/combined.bin
-COMBINED_WASM=target/1solang/combined.wasm
+COMBINED_WASM=target/solang/combined.wasm
 
 zstd ${COMBINED_EVM} &> /dev/null
 zstd ${COMBINED_WASM} &> /dev/null
 
-EVM_SIZE=$(wc -c <"${COMBINED_EVM}.zst")
-WASM_SIZE=$(wc -c <"${COMBINED_WASM}.zst")
+EVM_PLAIN=$(wc -c <"${COMBINED_EVM}")
+WASM_PLAIN=$(wc -c <"${COMBINED_WASM}")
+EVM_COMPRESSED=$(wc -c <"${COMBINED_EVM}.zst")
+WASM_COMPRESSED=$(wc -c <"${COMBINED_WASM}.zst")
 
-
-printf "| %-25s | %5u | %5u | %2u%% |\n" "**combined**" $((EVM_SIZE)) $((WASM_SIZE)) $((WASM_SIZE * 100 / EVM_SIZE - 100))
+printf "| %-25s | %5u | %5u | %2u%% | %2u%% | %2u%% |\n"\
+		**concatenated**\
+		$((EVM_COMPRESSED))\
+		$((WASM_COMPRESSED))\
+		$((EVM_COMPRESSED * 100 / EVM_PLAIN))\
+		$((WASM_COMPRESSED * 100 / WASM_PLAIN))\
+		$((WASM_COMPRESSED * 100 / EVM_COMPRESSED))
