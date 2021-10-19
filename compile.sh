@@ -8,9 +8,7 @@ compile_solidity() {
 	local name=${infile##*/}
 	local outpath=target/solidity/${name}
 	local outfile=${outpath}/${name}
-
 	mkdir -p ${outpath}
-
 	${compiler} -o ${outpath} --optimize --bin contracts/${infile}.sol &> /dev/null && \
 		xxd -r -p ${outfile}.bin ${outfile}.raw
 		mv ${outfile}.raw ${outfile}.bin
@@ -48,7 +46,7 @@ compile () {
 	compile_solang ${contract_name}
 }
 
-rm -r target/*
+rm -rf target/*
 mkdir -p solc-bin
 
 case "$OSTYPE" in
