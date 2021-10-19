@@ -51,7 +51,7 @@ compile () {
 	compile_solang ${contract_name}
 	local solc_size=$(wc -c <"target/solidity/result")
 	local solang_size=$(wc -c <"target/1solang/result")
-	echo "${ident} solidity: $((solc_size)) solang: $((solang_size)) wasm_overhead: $((solang_size * 100 / solc_size - 100))%"
+	printf "%-25s solidity: %5u solang: %5u overhead: %2u%%\n" ${ident} $((solc_size)) $((solang_size)) $((solang_size * 100 / solc_size - 100))
 }
 
 rm -rf target/*
