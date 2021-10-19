@@ -32,3 +32,11 @@ won't work on a compiler targeting another architecture. Second, differences in 
 
 Therefore we need to apply substantial changes to every contract before it can bea dded to the
 corpus in order to make it compile and establish comparability.
+
+## Results
+
+| Contract | EVM Size | WASM Size | Wasm Overhead |
+| -------- | -------- | --------- | ------------- |
+| ERC20PresetFixedSupply    |  2162 |  2891 | 33% |
+| UniswapV2Router02         |  5826 |  9219 | 58% |
+| **combined**              |  7849 | 11579 | 47% |

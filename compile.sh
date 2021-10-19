@@ -51,7 +51,7 @@ compile () {
 	compile_solang ${contract_name}
 	local solc_size=$(wc -c <"target/solidity/result")
 	local solang_size=$(wc -c <"target/1solang/result")
-	printf "%-25s solidity: %5u solang: %5u overhead: %2u%%\n" ${ident} $((solc_size)) $((solang_size)) $((solang_size * 100 / solc_size - 100))
+	printf "| %-25s | %5u | %5u | %2u%% |\n" ${ident} $((solc_size)) $((solang_size)) $((solang_size * 100 / solc_size - 100))
 }
 
 rm -rf target/*
@@ -66,16 +66,20 @@ case "$OSTYPE" in
 		;;
 esac
 
+printf "| Contract | EVM Size | WASM Size | Wasm Overhead |\n"
+printf "| -------- | -------- | --------- | ------------- |\n"
+
 compile "open-zeppelin/token/ERC20/presets/ERC20PresetFixedSupply" "v0.8.9+commit.e5eed63a"
 compile "UniswapV2Router02" "v0.6.6+commit.6c089d02"
 
 COMBINED_EVM=target/solidity/combined.bin
 COMBINED_WASM=target/1solang/combined.wasm
 
-zstd ${COMBINED_EVM}
-zstd ${COMBINED_WASM}
+zstd ${COMBINED_EVM} &> /dev/null
+zstd ${COMBINED_WASM} &> /dev/null
 
 EVM_SIZE=$(wc -c <"${COMBINED_EVM}.zst")
 WASM_SIZE=$(wc -c <"${COMBINED_WASM}.zst")
 
-echo "wasm overhead: $((WASM_SIZE * 100 / EVM_SIZE - 100))%"
+
+printf "| %-25s | %5u | %5u | %2u%% |\n" "**combined**" $((EVM_SIZE)) $((WASM_SIZE)) $((WASM_SIZE * 100 / EVM_SIZE - 100))
