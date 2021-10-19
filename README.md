@@ -10,7 +10,7 @@ them on the stack. Solang generates four 32bit stack accesses to emulate this. I
 improve comparability we do the following:
 
 - Patch all contracts used for comparisons to not use wide integers (use `uint32` everywhere).
-- Change solang so that it uses `uint32` for the builtin types (address, msg.value).
+- Pass `--value-size 4 --address-size 4` to solang so that 32bit is usedfor the builtin types (address, msg.value).
 
 ## How to use this repository
 

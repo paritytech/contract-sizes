@@ -12,6 +12,7 @@ compile_solidity() {
 	${compiler} -o ${outpath} --optimize --bin contracts/${infile}.sol &> /dev/null && \
 		xxd -r -p ${outfile}.bin ${outfile}.raw
 		mv ${outfile}.raw ${outfile}.bin
+		cat ${outfile}.bin >> ${outpath}/../combined.bin
 		zstd ${outfile}.bin
 }
 
@@ -25,6 +26,7 @@ compile_solang() {
 		rm ${outfile}.contract && \
 		wasm-opt -Oz --strip-producers --zero-filled-memory -o ${outfile}_opt.wasm ${outfile}.wasm &> /dev/null && \
 		mv ${outfile}_opt.wasm ${outfile}.wasm
+		cat ${outfile}.wasm >> ${outpath}/../combined.wasm
 		zstd ${outfile}.wasm
 }
 
@@ -60,3 +62,14 @@ esac
 
 compile "open-zeppelin/token/ERC20/presets/ERC20PresetFixedSupply" "v0.8.9+commit.e5eed63a"
 compile "UniswapV2Router02" "v0.6.6+commit.6c089d02"
+
+COMBINED_EVM=target/solidity/combined.bin
+COMBINED_WASM=target/1solang/combined.wasm
+
+zstd ${COMBINED_EVM}
+zstd ${COMBINED_WASM}
+
+EVM_SIZE=$(wc -c <"${COMBINED_EVM}.zst")
+WASM_SIZE=$(wc -c <"${COMBINED_WASM}.zst")
+
+echo "wasm overhead: $((WASM_SIZE * 100 / EVM_SIZE - 100))%"
