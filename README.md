@@ -42,6 +42,8 @@ wasm output when compared to the evm output.
 The concatenated row is what we get when we concatenate the uncompressed results of all
 contracts.
 
+Used solang version is commit `c2a8bd9881e64e41565cdfe088ffe9464c74dae4`.
+
 | Contract | EVM Compressed | WASM Compressed | EVM Ratio | WASM Ratio | Wasm Relative |
 | -------- | -------------- | --------------- | --------- | ---------- | ------------- |
 | `ERC20PresetFixedSupply.sol` |  2162 |  2891 | 50% | 34% | 133% |
