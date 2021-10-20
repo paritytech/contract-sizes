@@ -9,7 +9,7 @@ compile_solidity() {
 	local outpath=target/solidity/${name}
 	local outfile=${outpath}/${name}
 	mkdir -p ${outpath}
-	${compiler} -o ${outpath} --optimize --bin contracts/${infile}.sol &> /dev/null && \
+	${compiler} -o ${outpath} --optimize --bin contracts/${infile}.sol &> /dev/null  && \
 		xxd -r -p ${outfile}.bin ${outfile}.raw
 		mv ${outfile}.raw ${outfile}.bin
 		cat ${outfile}.bin >> ${outpath}/../combined.bin
@@ -80,6 +80,7 @@ printf "| Contract | EVM Compressed | WASM Compressed | EVM Ratio | WASM Ratio |
 printf "| -------- | -------------- | --------------- | --------- | ---------- | ------------- |\n"
 
 compile "open-zeppelin/token/ERC20/presets/ERC20PresetFixedSupply" "v0.8.9+commit.e5eed63a"
+compile "uniswap-v2-solang/UniswapV2Pair" "v0.5.16+commit.9c3226ce"
 compile "UniswapV2Router02" "v0.6.6+commit.6c089d02"
 
 COMBINED_EVM=target/solidity/combined.bin

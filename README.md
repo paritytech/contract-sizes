@@ -46,6 +46,7 @@ Used solang version is commit `c2a8bd9881e64e41565cdfe088ffe9464c74dae4`.
 
 | Contract | EVM Compressed | WASM Compressed | EVM Ratio | WASM Ratio | Wasm Relative |
 | -------- | -------------- | --------------- | --------- | ---------- | ------------- |
-| `ERC20PresetFixedSupply.sol` |  2162 |  2891 | 50% | 34% | 133% |
+| `UniswapV2Pair.sol`       |  3986 |  6912 | 44% | 33% | 173% |
 | `UniswapV2Router02.sol`   |  5826 |  9219 | 30% | 28% | 158% |
-| **concatenated**          |  7849 | 11579 | 33% | 28% | 147% |
+| `ERC20PresetFixedSupply.sol` |  2162 |  2891 | 50% | 34% | 133% |
+| **concatenated**          | 11112 | 17397 | 34% | 28% | 156% |
